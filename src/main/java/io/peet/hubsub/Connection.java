@@ -1,21 +1,17 @@
 package io.peet.hubsub;
 
-import akka.actor.Actor;
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 import akka.io.Tcp;
 import akka.io.TcpMessage;
 import akka.util.ByteString;
-import io.peet.hubsub.command.SubscribeCommand;
+import io.peet.hubsub.handler.*;
 import io.peet.hubsub.packet.*;
 import io.peet.hubsub.pubsub.Event;
 import io.peet.hubsub.pubsub.Publishable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 
 public class Connection extends UntypedActor implements Publishable {
 
@@ -30,10 +26,9 @@ public class Connection extends UntypedActor implements Publishable {
     protected Decoder decoder;
 
     /**
-     * Map of command names to handler functions, which take a command
-     * and result a packet response.
+     * Handler used for dispatching commands.
      */
-    protected Map<String, Function<Command, Packet>> dispatchers;
+    protected Handler handler;
 
     /**
      * The connection pool this belongs to.
@@ -44,37 +39,7 @@ public class Connection extends UntypedActor implements Publishable {
         this.connection = connection;
         this.decoder = new Decoder();
         this.pool = pool;
-
-        dispatchers = new HashMap<>();
-
-        dispatchers.put("publish", (Command cmd) -> {
-            pool.tell(new Event(
-                    cmd.arg(0).toString(),
-                    ((BulkStringPacket) cmd.arg(1)).getData()
-            ), getSelf());
-
-            return null;
-        });
-        dispatchers.put("subscribe", (Command cmd) -> baseSubscribe(cmd, false));
-        dispatchers.put("psubscribe", (Command cmd) -> baseSubscribe(cmd, true));
-    }
-
-    protected Packet baseSubscribe(Command cmd, boolean glob) {
-        String pattern = cmd.arg(0).toString();
-        pool.tell(new SubscribeCommand(pattern, this, glob), getSelf());
-
-        return makeReply(cmd.name(), pattern);
-    }
-
-    /**
-     * Creates a packet to reply to a subscription event.
-     * @param event command (subscribe/psubscribe)
-     * @param pattern pattern the subscribe was to
-     * @return a packet response
-     */
-    protected Packet makeReply(String event, String pattern) {
-        // todo: list the number of listeners in place of the `1`
-        return new ArrayPacket().add(event).add(pattern).add(1);
+        this.handler = new CommandHandler(this);
     }
 
     /**
@@ -82,31 +47,57 @@ public class Connection extends UntypedActor implements Publishable {
      * @param packet the packet to encode and write
      */
     protected void write(Packet packet) {
-        this.connection.tell(TcpMessage.write(packet.encode()), getSelf());
+        connection.tell(TcpMessage.write(packet.encode()), getSelf());
+    }
+
+    /**
+     * Tells the TCP connection to close.
+     */
+    protected void close() {
+        connection.tell(TcpMessage.close(), getSelf());
+    }
+
+    /**
+     * Sends an event to the pool.
+     * @param ev the event to send
+     */
+    protected void send(Object ev) {
+        pool.tell(ev, getSelf());
     }
 
     /**
      * Handles an incoming data packet and returns a response.
      * @param packet the incoming packet, which should be an ArrayPacket
      *               with a length of one or more.
-     * @return a response packet
      */
-    protected Packet processPacket(Packet packet) {
+    protected void processPacket(Packet packet) {
         if (!(packet instanceof ArrayPacket)) {
-            return new ErrorPacket("ERR invalid command type.");
+            write(new ErrorPacket("ERR invalid command type."));
+            return;
         }
 
         Command cmd = ((ArrayPacket) packet).asCommand();
         if (cmd == null) {
-            return new ErrorPacket("ERR invalid command format.");
+            write(new ErrorPacket("ERR invalid command format."));
+            return;
         }
 
-        String name = cmd.name();
-        if (dispatchers.containsKey(name)) {
-            return dispatchers.get(name).apply(cmd);
+        try {
+            Response[] responses = this.handler.handle(cmd);
+            for (Response response : responses) {
+                if (response instanceof PacketResponse) {
+                    write(((PacketResponse) response).getPacket());
+                } else if (response instanceof EventResponse) {
+                    send(((EventResponse) response).getEvent());
+                } else if (response instanceof CommandResponse) {
+                    send(((CommandResponse) response).getCommand());
+                } else if (response instanceof CloseResponse) {
+                    close();
+                }
+            }
+        } catch (UnhandledCommandException e) {
+            write(e.getError());
         }
-
-        return new ErrorPacket("ERR unknown command '" + cmd.name() + "'");
     }
 
     /**
@@ -127,10 +118,7 @@ public class Connection extends UntypedActor implements Publishable {
         }
 
         for (Packet input : todo) {
-            Packet reply = processPacket(input);
-            if (reply != null) {
-                write(reply);
-            }
+            processPacket(input);
         }
     }
 

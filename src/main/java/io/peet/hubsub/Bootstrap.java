@@ -17,6 +17,8 @@ public class Bootstrap extends UntypedActor {
                 Props.create(Server.class));
         final InetSocketAddress addr = new InetSocketAddress("localhost", 3221);
         server.tell(new Server.Open(addr), getSelf());
+
+        System.out.println("HubSub has started.");
     }
 
     @Override

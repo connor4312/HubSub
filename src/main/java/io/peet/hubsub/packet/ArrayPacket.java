@@ -101,7 +101,7 @@ public class ArrayPacket extends BulkDataPacket<List<Packet>> {
      * @return a command packet, or null if not enough info
      */
     public Command asCommand() {
-        if (data == null || data.size() < 2) {
+        if (data == null || data.size() == 0) {
             return null;
         }
 

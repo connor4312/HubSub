@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "bench": "node ",
+    "test": "node node_modules/mocha/bin/mocha test/*.js --timeout=40000",
+    "build": "node node_modules/mocha/bin/mocha test/*.js --timeout=40000 --rebuild"
+  },
+  "dependencies": {
+    "benchmark": "^1.0.0",
+    "chai": "^3.2.0",
+    "ioredis": "^1.6.1",
+    "mocha": "^2.2.5",
+    "redis": "^0.12.1"
+  }
+}
