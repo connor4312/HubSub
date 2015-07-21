@@ -65,7 +65,7 @@ The goal is to get as close to linear scalability as possible. There will be som
 
 ## Progress
 
-Currently HubSub's functionality is on par with a (somewhat inefficient) standalone Redis server.
+Currently HubSub's functionality is on par with a (somewhat inefficient, functions at about 80% of the speed speed) standalone Redis server.
 
  * [x] Implement Redis protocol parser and such
  * [x] Implement local pubsub pools

@@ -4,7 +4,7 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
 import akka.actor.ActorRef;
-import io.peet.hubsub.pubsub.Pool;
+import io.peet.hubsub.server.Server;
 
 import java.net.InetSocketAddress;
 

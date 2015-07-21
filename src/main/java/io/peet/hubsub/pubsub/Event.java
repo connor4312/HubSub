@@ -1,12 +1,8 @@
 package io.peet.hubsub.pubsub;
 
 import akka.util.ByteString;
-import io.peet.hubsub.packet.ArrayPacket;
-import io.peet.hubsub.packet.BulkStringPacket;
-import io.peet.hubsub.packet.Packet;
-
-import java.util.ArrayList;
-import java.util.List;
+import io.peet.hubsub.protocol.ArrayPacket;
+import io.peet.hubsub.protocol.Packet;
 
 public class Event {
 
