@@ -69,8 +69,8 @@ Currently HubSub's functionality is on par with a (somewhat inefficient) standal
 
  * [x] Implement Redis protocol parser and such
  * [x] Implement local pubsub pools
- * [ ] Implement connection acceptors and lifecycle **(in progress)**
- * [ ] Tie in a discovery service (pluggable, likely ZooKeeper or etcd to start)
+ * [x] Implement connection acceptors and lifecycle
+ * [ ] Tie in a discovery service (pluggable, likely ZooKeeper or etcd to start) **(in progress)**
  * [ ] Implement consensus algorithm (probably Raft)
  * [ ] Implement room assignment
  * [ ] Implement room maintenance, maybe a little REST API

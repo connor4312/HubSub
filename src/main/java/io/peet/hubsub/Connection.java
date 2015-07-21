@@ -5,6 +5,8 @@ import akka.actor.UntypedActor;
 import akka.io.Tcp;
 import akka.io.TcpMessage;
 import akka.util.ByteString;
+import io.peet.hubsub.command.DisconnectCommand;
+import io.peet.hubsub.command.UnsubscribeCommand;
 import io.peet.hubsub.handler.*;
 import io.peet.hubsub.packet.*;
 import io.peet.hubsub.pubsub.Event;
@@ -131,6 +133,12 @@ public class Connection extends UntypedActor implements Publishable {
         } else {
             unhandled(o);
         }
+    }
+
+    @Override
+    public void postStop() throws Exception {
+        super.postStop();
+        send(new DisconnectCommand(this));
     }
 
     @Override
