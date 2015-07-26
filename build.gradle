@@ -27,6 +27,8 @@ dependencies {
     compile 'commons-cli:commons-cli:1.2'
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.+'
+    compile group: 'com.typesafe.akka', name: 'akka-remote_2.10', version: '2.3.12'
+    compile group: 'com.typesafe.akka', name: 'akka-cluster_2.10', version: '2.3.12'
     compile group: 'com.typesafe.akka', name: 'akka-actor_2.10', version: '2.3.12'
     compile group: 'org.scala-lang', name: 'scala-library', version: '2.10.4'
 }
@@ -38,6 +40,6 @@ tasks.withType(ScalaCompile) {
 jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     manifest {
-        attributes 'Main-Class': 'io.peet.hubsub.Bootstrap'
+        attributes 'Main-Class': 'io.peet.hubsub.Daemon'
     }
 }

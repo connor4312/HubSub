@@ -25,10 +25,4 @@ public class Bootstrap extends UntypedActor {
     public void onReceive(Object msg) {
 
     }
-
-    public static void main(String[] args) {
-        ActorSystem.create("HubSub")
-                   .actorOf(Props.create(Bootstrap.class));
-
-    }
 }
