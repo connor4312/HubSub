@@ -9,13 +9,13 @@ At [Beam](https://github.com/WatchBeam), a big part of our service includes chat
 The goal of hubsub is for situations where pubsub is needed at a large scale but in relatively small increments, such as for chat rooms. Users in one chat room could care less what's happening in the other ninety nine thousands. HubSub aims to solve this by introducing "micro" clusters as rooms (think of them like keyspaces).
 
 ```
-    Client Asks                                                   
-     for Room                                                     
-         │                                                        
-         │                                                        
-         ▼                                                        
-┌────────────────┐                                                
-│ Already a room │                                                
+    Client Asks
+     for Room
+         │
+         │
+         ▼
+┌────────────────┐
+│ Already a room │
 │    created?    │───────────Yes┐
 └────────────────┘              │
          │                      │
@@ -70,9 +70,9 @@ Currently HubSub's functionality is on par with a (somewhat inefficient, functio
  * [x] Implement Redis protocol parser and such
  * [x] Implement local pubsub pools
  * [x] Implement connection acceptors and lifecycle
- * [ ] Get Akka cluster going **(in progress)**
- * [ ] Implement room assignment
- * [ ] Implement room maintenance, maybe a little REST API
+ * [x] Get Akka cluster going
+ * [x] Implement room assignment (Akka's really making this too easy...)
+ * [ ] Implement room maintenance, maybe a little REST API **(in progress)**
  * [ ] Implement room failovers, reassignments due to shifting load
  * [ ] Make fasterer
  * More to come?

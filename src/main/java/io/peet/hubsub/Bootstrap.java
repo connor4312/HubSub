@@ -1,15 +1,15 @@
 package io.peet.hubsub;
 
-import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
-import akka.actor.ActorRef;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.typesafe.config.Config;
-import io.peet.hubsub.server.Server;
-
-import java.net.InetSocketAddress;
+import io.peet.hubsub.pubsub.Pool;
+import io.peet.hubsub.pubsub.PubsubPool;
+import io.peet.hubsub.server.api.ApiServer;
+import io.peet.hubsub.server.protocol.ProtocolServer;
+import io.peet.hubsub.server.ServerFactory;
 
 public class Bootstrap extends UntypedActor {
 
@@ -18,16 +18,16 @@ public class Bootstrap extends UntypedActor {
     @Override
     public void preStart() {
         Config config = getContext().system().settings().config();
-        String host = config.getString("hubsub.protocol.addr.hostname");
-        int port = config.getInt("hubsub.protocol.addr.port");
-
-        // create the greeter actor
-        final ActorRef server = getContext().actorOf(
-                Props.create(Server.class));
-        final InetSocketAddress addr = new InetSocketAddress(host, port);
-        server.tell(new Server.Open(addr), getSelf());
-
-        log.info("Hubsub listening on {}", addr.toString());
+        PubsubPool pool = new Pool();
+        ServerFactory factory = new ServerFactory(getSelf());
+        factory.create(
+                getContext().actorOf(Props.create(ProtocolServer.class, pool)),
+                config.getConfig("hubsub.protocol.addr")
+        );
+        factory.create(
+                getContext().actorOf(Props.create(ApiServer.class, pool)),
+                config.getConfig("hubsub.api.addr")
+        );
     }
 
     @Override

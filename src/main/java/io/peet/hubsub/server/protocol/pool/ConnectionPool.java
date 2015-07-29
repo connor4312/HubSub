@@ -1,4 +1,4 @@
-package io.peet.hubsub.server;
+package io.peet.hubsub.server.protocol.pool;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
@@ -8,6 +8,7 @@ import akka.io.TcpMessage;
 import io.peet.hubsub.pubsub.Event;
 import io.peet.hubsub.pubsub.Publishable;
 import io.peet.hubsub.pubsub.PubsubPool;
+import io.peet.hubsub.server.protocol.Connection;
 
 import java.util.function.BiConsumer;
 

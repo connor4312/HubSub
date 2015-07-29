@@ -1,4 +1,4 @@
-package io.peet.hubsub.server.handler;
+package io.peet.hubsub.server.protocol.shuttle;
 
 import io.peet.hubsub.protocol.Packet;
 

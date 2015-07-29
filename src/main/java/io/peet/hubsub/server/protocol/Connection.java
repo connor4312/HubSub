@@ -1,14 +1,14 @@
-package io.peet.hubsub.server;
+package io.peet.hubsub.server.protocol;
 
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 import akka.io.Tcp;
 import akka.io.TcpMessage;
 import akka.util.ByteString;
-import io.peet.hubsub.server.handler.*;
 import io.peet.hubsub.protocol.*;
 import io.peet.hubsub.pubsub.Event;
 import io.peet.hubsub.pubsub.Publishable;
+import io.peet.hubsub.server.protocol.pool.DisconnectCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class Connection extends UntypedActor implements Publishable {
     /**
      * Handler used for dispatching commands.
      */
-    protected Handler handler;
+    protected io.peet.hubsub.server.shuttle.Handler handler;
 
     /**
      * The connection pool this belongs to.
@@ -39,7 +39,7 @@ public class Connection extends UntypedActor implements Publishable {
         this.connection = connection;
         this.decoder = new Decoder();
         this.pool = pool;
-        this.handler = new CommandHandler(this);
+        this.handler = new io.peet.hubsub.server.shuttle.CommandHandler(this);
     }
 
     /**
@@ -83,19 +83,19 @@ public class Connection extends UntypedActor implements Publishable {
         }
 
         try {
-            Response[] responses = this.handler.handle(cmd);
-            for (Response response : responses) {
-                if (response instanceof PacketResponse) {
-                    write(((PacketResponse) response).getPacket());
-                } else if (response instanceof EventResponse) {
-                    send(((EventResponse) response).getEvent());
-                } else if (response instanceof CommandResponse) {
-                    send(((CommandResponse) response).getCommand());
-                } else if (response instanceof CloseResponse) {
+            io.peet.hubsub.server.shuttle.Response[] responses = this.handler.handle(cmd);
+            for (io.peet.hubsub.server.shuttle.Response response : responses) {
+                if (response instanceof io.peet.hubsub.server.shuttle.PacketResponse) {
+                    write(((io.peet.hubsub.server.shuttle.PacketResponse) response).getPacket());
+                } else if (response instanceof io.peet.hubsub.server.shuttle.EventResponse) {
+                    send(((io.peet.hubsub.server.shuttle.EventResponse) response).getEvent());
+                } else if (response instanceof io.peet.hubsub.server.shuttle.CommandResponse) {
+                    send(((io.peet.hubsub.server.shuttle.CommandResponse) response).getCommand());
+                } else if (response instanceof io.peet.hubsub.server.shuttle.CloseResponse) {
                     close();
                 }
             }
-        } catch (UnhandledCommandException e) {
+        } catch (io.peet.hubsub.server.shuttle.UnhandledCommandException e) {
             write(e.getError());
         }
     }

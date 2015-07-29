@@ -1,11 +1,11 @@
-package io.peet.hubsub.server.handler;
+package io.peet.hubsub.server.protocol.shuttle;
 
 import io.peet.hubsub.protocol.*;
 import io.peet.hubsub.pubsub.Event;
 import io.peet.hubsub.pubsub.Publishable;
-import io.peet.hubsub.server.PubsubCommand;
-import io.peet.hubsub.server.SubscribeCommand;
-import io.peet.hubsub.server.UnsubscribeCommand;
+import io.peet.hubsub.server.protocol.pool.PubsubCommand;
+import io.peet.hubsub.server.protocol.pool.SubscribeCommand;
+import io.peet.hubsub.server.protocol.pool.UnsubscribeCommand;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

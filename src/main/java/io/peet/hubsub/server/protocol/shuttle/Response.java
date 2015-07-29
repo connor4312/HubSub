@@ -1,4 +1,4 @@
-package io.peet.hubsub.server.handler;
+package io.peet.hubsub.server.protocol.shuttle;
 
 /**
  * A response is returned from the handle() method and dictates what

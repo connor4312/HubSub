@@ -1,6 +1,6 @@
-package io.peet.hubsub.server.handler;
+package io.peet.hubsub.server.protocol.shuttle;
 
-import io.peet.hubsub.server.PubsubCommand;
+import io.peet.hubsub.server.protocol.pool.PubsubCommand;
 
 public class CommandResponse implements Response {
 
